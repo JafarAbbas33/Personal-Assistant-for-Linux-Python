@@ -2,4 +2,4 @@
 *.log
 
 # ignore ALL files in ANY directory named temp
-"STAGING FOLDER/"
+STAGING FOLDER/
