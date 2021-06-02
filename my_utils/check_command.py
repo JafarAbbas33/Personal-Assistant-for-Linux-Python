@@ -38,7 +38,7 @@ def command_present(my_spoken_text):
     my_spoken_text = my_spoken_text.lower()
 
     if 'shutdown' in my_spoken_text:
-        app_terminator.terminate()
+        AssistantCommunicationsHandler.terminate()
         shutdown()
         return True
 
@@ -58,6 +58,7 @@ def command_present(my_spoken_text):
         return False
 
     if is_com_present(my_spoken_text, [], ['play a random song', 'play a song', 'play some music', 'play some song', 'play music']):
+        play_media('my_utils/assistant_replies/Sure sir! Playing songs!.wav', threaded = False)
         play_media(os.environ['music_directory'])
         return True
 

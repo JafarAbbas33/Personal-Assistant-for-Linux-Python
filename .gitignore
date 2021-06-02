@@ -1,2 +1,4 @@
 *.log
 STAGING FOLDER/
+__pycache__/
+*natalie.ppn
