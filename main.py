@@ -20,6 +20,11 @@ os.environ['hotword_library_path'] = 'YOUR HOTWORD LIBRARY FILE PATH' # Ends wit
 os.environ['hotword_model_file_path'] = 'YOUR HOTWORD MODEL FILE PATH' # Ends with '/porcupine_params.pv'
 os.environ['hotword_keyword_file_paths'] = 'YOUR HOTWORD KEYWORD FILE PATH' # Ends with '/keyword_files'
 
+# Updating environment variables
+if os.environ['music_directory'] == 'YOUR MUSIC DIRECTORY':
+    from STAGING_FOLDER import environ
+    environ.update_enviroment_variables()
+
 # -----------------------------------------------------------------------
 
 sys.path.insert(0, 'utils')
