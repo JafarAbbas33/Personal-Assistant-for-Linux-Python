@@ -2,3 +2,12 @@ mss
 Pillow
 numpy
 pvporcupine
+pyaudio
+SoundFile
+google-assistant-sdk
+pathlib2
+google-assistant-sdk[samples]
+google-assistant-grpc
+google-auth-oauthlib[tool]
+youtube-search-python
+pytube
