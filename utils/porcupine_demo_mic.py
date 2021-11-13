@@ -21,7 +21,7 @@ import app_terminator
 kb = kb2()
 
 
-class PorcupineDemo(Thread):
+class PorcupineClass(Thread):
     """
     Demo class for wake word detection (aka Porcupine) library. It creates an input audio stream from a microphone,
     monitors it, and upon detecting the specified wake word(s) prints the detection time and index of wake word on
@@ -167,7 +167,7 @@ def main():
     library_path = os.environ['hotword_library_path']
     model_file_path = os.environ['hotword_model_file_path']
 
-    PorcupineDemo(
+    PorcupineClass(
         library_path=library_path,
         model_file_path=model_file_path,
         keyword_file_paths=keyword_file_paths,

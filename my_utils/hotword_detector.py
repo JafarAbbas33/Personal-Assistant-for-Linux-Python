@@ -21,7 +21,7 @@ import pyaudio
 import soundfile
 
 
-class PorcupineDemo(Thread):
+class PorcupineClass(Thread):
     """
     Microphone Demo for Porcupine wake word engine. It creates an input audio stream from a microphone, monitors it, and
     upon detecting the specified wake word(s) prints the detection time and wake word on console. It optionally saves
@@ -51,7 +51,7 @@ class PorcupineDemo(Thread):
         :param output_path: If provided recorded audio will be stored in this location at the end of the run.
         """
 
-        super(PorcupineDemo, self).__init__()
+        super(PorcupineClass, self).__init__()
 
         self._library_path = library_path
         self._model_path = model_path
@@ -144,7 +144,7 @@ class PorcupineDemo(Thread):
 
 
 def start_hotword_detection():
-    PorcupineDemo(
+    PorcupineClass(
         library_path=pvporcupine.LIBRARY_PATH,
         model_path=pvporcupine.MODEL_PATH,
         keyword_paths=[os.environ['hotword_full_path']],
