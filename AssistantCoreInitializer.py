@@ -5,7 +5,7 @@ import logging
 import threading
 
 import hotword_detector
-from AssistantCommunicationsHandler import AssistantCommunicationsHandler
+from Assistant import Assistant
 
 from AssistantCore import AssistantCore
 
@@ -26,18 +26,18 @@ from google.assistant.embedded.v1alpha2 import (
 )
 from tenacity import retry, stop_after_attempt, retry_if_exception
 
-try:
-    from . import (
-        assistant_helpers,
-        audio_helpers,
-        browser_helpers,
-        device_helpers
-    )
-except (SystemError, ImportError):
-    import assistant_helpers
-    import audio_helpers
-    import browser_helpers
-    import device_helpers
+# try:
+# from . import (
+#     assistant_helpers,
+#     audio_helpers,
+#     browser_helpers,
+#     device_helpers
+# )
+# except (SystemError, ImportError):
+import assistant_helpers
+import audio_helpers
+import browser_helpers
+import device_helpers
 
 
 
@@ -193,22 +193,22 @@ def AssistantCoreInitializer():
         wait_for_user_trigger = not once
         assistant.conversation_stream.volume_percentage = 100
         
-        AssistantCommunicationsHandler.assistant = assistant
-        AssistantCommunicationsHandler.logger.info('Listening... Press Esc key to exit\n')
-        AssistantCommunicationsHandler.update_text('Hello sir!')
+        Assistant.assistant = assistant
+        Assistant.logger.info('Listening... Press Esc key to exit\n')
+        Assistant.update_text('Hello sir!')
         
         time.sleep(2)
-        AssistantCommunicationsHandler.minimize()
+        Assistant.minimize()
 
         while True:
             if wait_for_user_trigger:
                 hotword_detector.start_hotword_detection()                    
                 
-            AssistantCommunicationsHandler.bring_to_front()
+            Assistant.bring_to_front()
             continue_conversation = assistant.assist()
-            AssistantCommunicationsHandler.minimize()
+            Assistant.minimize()
             
-            AssistantCommunicationsHandler.logger.info('Thread count: ' + f'{threading.active_count()}')
+            Assistant.logger.info('Thread count: ' + f'{threading.active_count()}')
             
             if continue_conversation == None:
                 return False

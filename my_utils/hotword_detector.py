@@ -82,6 +82,7 @@ class PorcupineClass(Thread):
         audio_stream = None
         try:
             porcupine = pvporcupine.create(
+                access_key=os.environ['porcupine_access_key'],
                 library_path=self._library_path,
                 model_path=self._model_path,
                 keyword_paths=self._keyword_paths,

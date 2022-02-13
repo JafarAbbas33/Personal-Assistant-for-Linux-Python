@@ -16,21 +16,21 @@ from google.assistant.embedded.v1alpha2 import (
 )
 from tenacity import retry, stop_after_attempt, retry_if_exception
 
-try:
-    from . import (
-        assistant_helpers,
-        audio_helpers,
-        browser_helpers,
-        device_helpers
-    )
-except (SystemError, ImportError):
-    import assistant_helpers
-    import audio_helpers
-    import browser_helpers
-    import device_helpers
+# try:
+# from . import (
+#     assistant_helpers,
+#     audio_helpers,
+#     browser_helpers,
+#     device_helpers
+# )
+# except (SystemError, ImportError):
+import assistant_helpers
+import audio_helpers
+import browser_helpers
+import device_helpers
 
 from check_command import command_present
-from AssistantCommunicationsHandler import AssistantCommunicationsHandler
+from Assistant import Assistant
 
 
 ASSISTANT_API_ENDPOINT = 'embeddedassistant.googleapis.com'
@@ -87,7 +87,7 @@ class AssistantCore(object):
     def __exit__(self, etype, e, traceback):
         if e:
             return False
-        AssistantCommunicationsHandler.logger.info('Closing')
+        Assistant.logger.info('Closing')
         self.conversation_stream.close()
 
     def is_grpc_error_unavailable(e):
@@ -108,7 +108,7 @@ class AssistantCore(object):
         device_actions_futures = []
 
         self.conversation_stream.start_recording()
-        AssistantCommunicationsHandler.logger.info('Recording audio request.')
+        Assistant.logger.info('Recording audio request.')
 
         def iter_log_assist_requests():
             for c in self.gen_assist_requests():
@@ -126,7 +126,7 @@ class AssistantCore(object):
                 logging.info('Stopping recording.')
                 self.conversation_stream.stop_recording()
             if resp.speech_results:
-                AssistantCommunicationsHandler.logger.info('Transcript of user request: ' +
+                Assistant.logger.info('Transcript of user request: ' +
                              ' '.join(r.transcript
                                       for r in resp.speech_results))
 
@@ -136,8 +136,8 @@ class AssistantCore(object):
                 text = ' '.join(r.transcript for r in resp.speech_results)
                 my_spoken_text = text
                 full_text = text
-                AssistantCommunicationsHandler.logger.info(text)
-                AssistantCommunicationsHandler.update_text(text)
+                Assistant.logger.info(text)
+                Assistant.update_text(text)
 ########################################################################################################################
             if len(resp.audio_out.audio_data) > 0:
                 if not self.conversation_stream.playing:
@@ -147,8 +147,8 @@ class AssistantCore(object):
                     self.conversation_stream.start_playback()
                     logging.info('Playing assistant response.')
                     print('Playing assistant response.')
-                elif AssistantCommunicationsHandler.stop_playback:
-                    AssistantCommunicationsHandler.stop_playback = False
+                elif Assistant.stop_playback:
+                    Assistant.stop_playback = False
                     self.conversation_stream.stop_playback()
                     return False
                 self.conversation_stream.write(resp.audio_out.audio_data)
@@ -180,7 +180,7 @@ class AssistantCore(object):
                 text_response = resp.dialog_state_out.supplemental_display_text
                 text_response = text_response.encode('unicode-escape').decode('utf-8')
 
-                AssistantCommunicationsHandler.logger.info(text_response)
+                Assistant.logger.info(text_response)
                 
         
         if len(device_actions_futures):

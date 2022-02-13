@@ -38,7 +38,7 @@ from icecream import ic, install
 from PIL import ImageFont, ImageDraw
 
 from AssistantCoreInitializer import AssistantCoreInitializer
-from AssistantCommunicationsHandler import AssistantCommunicationsHandler
+from Assistant import Assistant
 
 install()
 
@@ -46,7 +46,7 @@ install()
 # Handling GUI
 #--------------------------------------------------------------
 
-class TextUtil:
+class ImageUtil:
     pass
  
 def update_text(text):
@@ -56,25 +56,34 @@ def update_text(text):
 
 def bring_to_front():
     update_text("")
-    global image, mic, w, h, im, oo, monitor
+
+    mic_width, mic_height = 58, 80
+
+    mic = Assistant.Gui.mic
+    black_canvas = Assistant.Gui.black_canvas
+
     with mss.mss() as sct:
-        sct_img = sct.grab(monitor)
+        sct_img = sct.grab(Assistant.Gui.monitor)
         #sct_img = sct.shot(output = "xoxo" + x + ".jpg")
-        im = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
-        #AssistantCommunicationsHandler.screenshot = im.copy()
+        screenshot = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
+        #Assistant.screenshot = screenshot.copy()
         
-    im = Image.blend(im,image,0.65)
-    width, height = image.size
-    past_w = round((width-w)/2)
-    past_h = round((height-h)/2)
-    im.paste(mic, (past_w, past_h), mic)
-    oo = ImageTk.PhotoImage(im)
+    screenshot = Image.blend(screenshot,black_canvas,0.65)
+    width, height = Assistant.Gui.monitor['width'], Assistant.Gui.monitor['height']
+
+    past_w = round((width-mic_width)/2)
+    past_h = round((height-mic_height)/2)
+
+    print(past_w, past_h)
+
+    screenshot.paste(mic, (past_w, past_h), mic)
+    assistant_window_canvas = ImageTk.PhotoImage(screenshot)
     root.state('normal')
     
-    canvas.itemconfigure(image_label, image=oo)
+    canvas.itemconfigure(image_label, image=assistant_window_canvas)
     
-    TextUtil.im = im
-    TextUtil.current_h = past_h + 250
+    ImageUtil.screenshot = screenshot
+    ImageUtil.current_h = past_h + 250
 
 
 def minimize():
@@ -85,19 +94,19 @@ def minimize():
 
 def keep_screen_awake():
     os.system('xdg-screensaver reset')
-    AssistantCommunicationsHandler.logger.info('Pinged!')
+    Assistant.logger.info('Pinged!')
     root.after(150000, keep_screen_awake)
 
 def key_pressed(event):
     if '' == event.char:
-        AssistantCommunicationsHandler.stop_playback = True
+        Assistant.stop_playback = True
     elif '' == event.char:
-        AssistantCommunicationsHandler.logger.info('Request destroy')
-        AssistantCommunicationsHandler.terminate()
+        Assistant.logger.info('Request destroy')
+        Assistant.terminate()
 
 def on_closing():
-    AssistantCommunicationsHandler.logger.info('Destroying')
-    AssistantCommunicationsHandler.terminate()
+    Assistant.logger.info('Destroying')
+    Assistant.terminate()
 
 
 # -------------------------------------------------------------
@@ -122,9 +131,7 @@ def set_cwd():
     cwd = '/'.join(script_location)
     os.chdir(cwd)
 
-if __name__ == '__main__':
-    set_cwd()
-    
+def initialize_root_window():
     root = tk.Tk()
 
     icon = ImageTk.PhotoImage(master=root, file='utils/favicon.ico')
@@ -132,37 +139,41 @@ if __name__ == '__main__':
 
     root.title("Assistant")
     root.attributes("-fullscreen", True)
+    return root
 
-    mic = Image.open("utils/Google_mic.png")
-    mic = mic.resize((58, 80), Image.ANTIALIAS)
-    w,h=mic.size
-    ww = root.winfo_screenwidth()
-    hh = root.winfo_screenheight()    
-    monitor = {'left': 0, 'top': 0, 'width': ww, 'height': hh}
+
+def setup_root_window():
+    pass
+
+if __name__ == '__main__':
+    set_cwd()
+    root = initialize_root_window()
+    
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()    
     # font = ImageFont.truetype("utils/Montserrat-Medium.ttf", size=70)
     # font = ImageFont.load_default()
-    spacing_bw_text = 10
-    o_w = 0
 
-    # Fill up AssistantCommunicationsHandler
-    AssistantCommunicationsHandler.root = root
-    AssistantCommunicationsHandler.minimize = minimize
-    AssistantCommunicationsHandler.logger = get_logger()
-    AssistantCommunicationsHandler.update_text = update_text
-    AssistantCommunicationsHandler.bring_to_front = bring_to_front
+    # Fill up Assistant
+    Assistant.Gui.mic = Image.open("utils/Google_mic.png")
+    Assistant.Gui.root = root
+    Assistant.Gui.minimize = minimize
+    Assistant.Gui.update_text = update_text
+    Assistant.Gui.bring_to_front = bring_to_front
+    Assistant.Gui.monitor = {'left': 0, 'top': 0, 'width': screen_width, 'height': screen_height}
+    Assistant.Gui.black_canvas = ImageTk.PhotoImage(Image.new("RGB", (screen_width, screen_height), "black"))
+    
+    Assistant.logger = get_logger()
 
-    image = Image.new("RGB", (ww, hh), "black")
-    oo = ImageTk.PhotoImage(image)
-
-    canvas = tk.Canvas(root, width=ww, height=hh)
+    canvas = tk.Canvas(root, width=screen_width, height=screen_height)
     canvas.pack()
-    image_label = canvas.create_image(ww, 0, image=oo, anchor="ne")
-    text_label = canvas.create_text(ww//2, hh/2+200, text="", font=("Ubuntu", 26), fill="white")
+    image_label = canvas.create_image(screen_width, 0, image=Assistant.Gui.black_canvas, anchor="ne")
+    text_label = canvas.create_text(screen_width//2, screen_height/2+200, text="", font=("Ubuntu", 26), fill="white")
 
     bring_to_front()
     update_text("Initializing")
-    AssistantCommunicationsHandler.logger.info('-----------------------------------------\n')
-    AssistantCommunicationsHandler.logger.info('Initializing')
+    Assistant.logger.info('-----------------------------------------\n')
+    Assistant.logger.info('Initializing')
 
     threading.Thread(target = AssistantCoreInitializer).start()
 

@@ -11,3 +11,6 @@ google-assistant-grpc
 google-auth-oauthlib[tool]
 youtube-search-python
 pytube
+playsound
+icecream
+tenacity

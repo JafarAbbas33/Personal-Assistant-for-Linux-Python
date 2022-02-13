@@ -4,4 +4,6 @@ This repository will host the personal assistant for Linux system created using 
 This project requires a ppn file. Personally I create a hotword named 'Natalie' using site: https://console.picovoice.ai/ppn
 And save it in ***my_utils*** folder.
 
-Also this project assumes you have audacious already installed.
+***Features***
+1) Backspace button stops the assistant from speaking further.
+2) Escape button quits the assistant.

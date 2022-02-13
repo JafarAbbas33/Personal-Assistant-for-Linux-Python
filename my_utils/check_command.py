@@ -6,7 +6,7 @@ import subprocess
 import webbrowser
 
 from commands_executor import shutdown
-from AssistantCommunicationsHandler import AssistantCommunicationsHandler
+from Assistant import Assistant
 from media_controller import stop_media, play_media, resume_media, pause_media
 
 def log(data):
@@ -38,13 +38,13 @@ def command_present(my_spoken_text):
     my_spoken_text = my_spoken_text.lower()
 
     if 'shutdown' in my_spoken_text:
-        AssistantCommunicationsHandler.terminate()
+        Assistant.terminate()
         shutdown()
         return True
 
     command_test = is_com_present(my_spoken_text, ['search', 'on google'], [])
     if command_test:
-        AssistantCommunicationsHandler.logger.info(command_test)
+        Assistant.logger.info(command_test)
         url = 'https://www.google.com/search?channel=fs&client=ubuntu&q=' + command_test.replace(' ', '+')
         webbrowser.open(url, 2)
         return True
@@ -64,7 +64,7 @@ def command_present(my_spoken_text):
 
     command_test = is_com_present(my_spoken_text, ['play', 'youtube'], [])
     if command_test:
-        AssistantCommunicationsHandler.logger.info(command_test)
+        Assistant.logger.info(command_test)
         youtube.download_and_play_song(command_test)
         return True
 
@@ -81,9 +81,9 @@ def command_present(my_spoken_text):
         return True
     
     if is_com_present(my_spoken_text, [], ['goodbye', 'quit', 'exit', 'good bye']):
-        AssistantCommunicationsHandler.logger.info('Heard exit command')
-        AssistantCommunicationsHandler.terminate()
-        AssistantCommunicationsHandler.logger.info('Returning after hearing exit command')
+        Assistant.logger.info('Heard exit command')
+        Assistant.terminate()
+        Assistant.logger.info('Returning after hearing exit command')
         return True
     
     return False

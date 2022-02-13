@@ -1,5 +1,5 @@
 from media_controller import stop_media, play_media, resume_media, pause_media
-from AssistantCommunicationsHandler import AssistantCommunicationsHandler
+from Assistant import Assistant
 from youtubesearchpython import SearchVideos
 from pytube import YouTube
 
@@ -10,7 +10,7 @@ import threading
 
 
 def get_video_url(query):
-    AssistantCommunicationsHandler.logger.info('Getting video URL')
+    Assistant.logger.info('Getting video URL')
     search = SearchVideos(query, offset = 1, mode = "json", max_results = 3)
     result = json.loads(search.result())
     vid_id = result['search_result'][0]['id']
@@ -20,7 +20,7 @@ def download_video(query):
     vid_url = get_video_url(query)
     yt = YouTube(vid_url)
     selected_file = yt.streams.filter(adaptive=True, only_audio=True)[0]
-    AssistantCommunicationsHandler.logger.info('Downloading...')
+    Assistant.logger.info('Downloading...')
     selected_file.download()
     return selected_file.default_filename
 
