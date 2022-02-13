@@ -82,7 +82,8 @@ def command_present(my_spoken_text):
     
     if is_com_present(my_spoken_text, [], ['goodbye', 'quit', 'exit', 'good bye']):
         Assistant.logger.info('Heard exit command')
-        Assistant.terminate()
+        # Assistant.terminate()
+        Assistant.terminate_flag = True
         Assistant.logger.info('Returning after hearing exit command')
         return True
     

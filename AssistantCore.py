@@ -87,7 +87,7 @@ class AssistantCore(object):
     def __exit__(self, etype, e, traceback):
         if e:
             return False
-        Assistant.logger.info('Closing')
+        Assistant.logger.info('Closing assistant...')
         self.conversation_stream.close()
 
     def is_grpc_error_unavailable(e):
@@ -137,7 +137,7 @@ class AssistantCore(object):
                 my_spoken_text = text
                 full_text = text
                 Assistant.logger.info(text)
-                Assistant.update_text(text)
+                Assistant.Gui.update_text(text)
 ########################################################################################################################
             if len(resp.audio_out.audio_data) > 0:
                 if not self.conversation_stream.playing:

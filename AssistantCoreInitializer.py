@@ -195,30 +195,28 @@ def AssistantCoreInitializer():
         
         Assistant.assistant = assistant
         Assistant.logger.info('Listening... Press Esc key to exit\n')
-        Assistant.update_text('Hello sir!')
+        Assistant.Gui.update_text('Hello sir!')
         
         time.sleep(2)
-        Assistant.minimize()
+        Assistant.Gui.minimize()
 
         while True:
             if wait_for_user_trigger:
-                hotword_detector.start_hotword_detection()                    
+                hotword_detector.start_hotword_detection()
+                if Assistant.terminate_flag:
+                    Assistant.Gui.root.event_generate("<<terminate>>", when="tail")
+                    return False
                 
-            Assistant.bring_to_front()
+            Assistant.Gui.bring_to_front()
             continue_conversation = assistant.assist()
-            Assistant.minimize()
+            # print(continue_conversation)
+            Assistant.Gui.minimize()
             
             Assistant.logger.info('Thread count: ' + f'{threading.active_count()}')
             
-            if continue_conversation == None:
-                return False
+            # if continue_conversation == None:
+            #     return False
             
             # wait for user trigger if there is no follow-up turn in
             # the conversation.
             wait_for_user_trigger = not continue_conversation
-
-            # If we only want one conversation, break.
-            if once and (not continue_conversation):
-                return
-
-

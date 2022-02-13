@@ -36,7 +36,8 @@ def _download_and_play_song(query):
             c += 1
     
 def download_and_play_song(query):
-    threading.Thread(target = lambda: _download_and_play_song(query)).start()
+    pass
+    # threading.Thread(target = lambda: _download_and_play_song(query)).start()
 
 if __name__ == '__main__':
     download_and_play_song('arora')

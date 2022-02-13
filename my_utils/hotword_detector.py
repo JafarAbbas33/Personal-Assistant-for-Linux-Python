@@ -9,7 +9,6 @@
 # specific language governing permissions and limitations under the License.
 #
 
-import argparse
 import os
 import struct
 from datetime import datetime
@@ -19,6 +18,8 @@ import numpy as np
 import pvporcupine
 import pyaudio
 import soundfile
+
+from Assistant import Assistant
 
 
 class PorcupineClass(Thread):
@@ -111,7 +112,7 @@ class PorcupineClass(Thread):
                     self._recorded_frames.append(pcm)
 
                 result = porcupine.process(pcm)
-                if result >= 0:
+                if result >= 0 or Assistant.terminate_flag:
                     print('[%s] Detected %s' % (str(datetime.now()), keywords[result]))
                     break
 

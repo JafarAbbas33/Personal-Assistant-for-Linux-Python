@@ -45,46 +45,33 @@ install()
 #--------------------------------------------------------------
 # Handling GUI
 #--------------------------------------------------------------
-
-class ImageUtil:
-    pass
  
 def update_text(text):
     canvas.itemconfigure(text_label, text=text)
     return
 
-
 def bring_to_front():
     update_text("")
-
-    mic_width, mic_height = 58, 80
 
     mic = Assistant.Gui.mic
     black_canvas = Assistant.Gui.black_canvas
 
     with mss.mss() as sct:
         sct_img = sct.grab(Assistant.Gui.monitor)
-        #sct_img = sct.shot(output = "xoxo" + x + ".jpg")
+        # sct_img = sct.shot(output = "xoxo" + x + ".jpg")
         screenshot = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
-        #Assistant.screenshot = screenshot.copy()
+        # Assistant.screenshot = screenshot.copy()
         
-    screenshot = Image.blend(screenshot,black_canvas,0.65)
-    width, height = Assistant.Gui.monitor['width'], Assistant.Gui.monitor['height']
+    Assistant.Gui.screenshot = screenshot
 
-    past_w = round((width-mic_width)/2)
-    past_h = round((height-mic_height)/2)
+    assistant_window_canvas = Image.blend(screenshot, black_canvas, 0.65)
+    assistant_window_canvas.paste(mic, (Assistant.Gui.mic_location['x'], Assistant.Gui.mic_location['y']), mic)
+    assistant_window_canvas = ImageTk.PhotoImage(assistant_window_canvas)
 
-    print(past_w, past_h)
-
-    screenshot.paste(mic, (past_w, past_h), mic)
-    assistant_window_canvas = ImageTk.PhotoImage(screenshot)
+    Assistant.Gui.assistant_window_canvas = assistant_window_canvas
     root.state('normal')
     
     canvas.itemconfigure(image_label, image=assistant_window_canvas)
-    
-    ImageUtil.screenshot = screenshot
-    ImageUtil.current_h = past_h + 250
-
 
 def minimize():
     while root.state() == 'normal':
@@ -102,11 +89,9 @@ def key_pressed(event):
         Assistant.stop_playback = True
     elif '' == event.char:
         Assistant.logger.info('Request destroy')
-        Assistant.terminate()
-
-def on_closing():
-    Assistant.logger.info('Destroying')
-    Assistant.terminate()
+        Assistant.stop_playback = True
+        Assistant.terminate_flag = True
+        # Assistant.terminate()
 
 
 # -------------------------------------------------------------
@@ -134,20 +119,20 @@ def set_cwd():
 def initialize_root_window():
     root = tk.Tk()
 
-    icon = ImageTk.PhotoImage(master=root, file='utils/favicon.ico')
-    root.wm_iconphoto(True, icon)
+    Assistant.Gui.icon = ImageTk.PhotoImage(master=root, file='utils/favicon.ico')
+    root.wm_iconphoto(True, Assistant.Gui.icon)
 
     root.title("Assistant")
     root.attributes("-fullscreen", True)
     return root
 
 
-def setup_root_window():
-    pass
+
 
 if __name__ == '__main__':
     set_cwd()
     root = initialize_root_window()
+    #print(dir(root)) # after # generate_event # destroy
     
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()    
@@ -155,19 +140,23 @@ if __name__ == '__main__':
     # font = ImageFont.load_default()
 
     # Fill up Assistant
+    Assistant.Gui.monitor = {'left': 0, 'top': 0, 'width': screen_width, 'height': screen_height}
     Assistant.Gui.mic = Image.open("utils/Google_mic.png")
+    Assistant.Gui.mic_size = {'width': 58, 'height': 80}
+    Assistant.Gui.mic_location = {'x': round((screen_width-Assistant.Gui.mic_size['width'])/2), 'y': round((screen_height-Assistant.Gui.mic_size['height'])/2)}
     Assistant.Gui.root = root
     Assistant.Gui.minimize = minimize
     Assistant.Gui.update_text = update_text
     Assistant.Gui.bring_to_front = bring_to_front
-    Assistant.Gui.monitor = {'left': 0, 'top': 0, 'width': screen_width, 'height': screen_height}
-    Assistant.Gui.black_canvas = ImageTk.PhotoImage(Image.new("RGB", (screen_width, screen_height), "black"))
-    
+    Assistant.Gui.black_canvas = Image.new("RGB", (screen_width, screen_height), "black")
+
+    black_canvas = ImageTk.PhotoImage(Assistant.Gui.black_canvas)
+
     Assistant.logger = get_logger()
 
     canvas = tk.Canvas(root, width=screen_width, height=screen_height)
     canvas.pack()
-    image_label = canvas.create_image(screen_width, 0, image=Assistant.Gui.black_canvas, anchor="ne")
+    image_label = canvas.create_image(screen_width, 0, image=black_canvas, anchor="ne")
     text_label = canvas.create_text(screen_width//2, screen_height/2+200, text="", font=("Ubuntu", 26), fill="white")
 
     bring_to_front()
@@ -175,13 +164,13 @@ if __name__ == '__main__':
     Assistant.logger.info('-----------------------------------------\n')
     Assistant.logger.info('Initializing')
 
-    threading.Thread(target = AssistantCoreInitializer).start()
+    Assistant.assistant_thread = threading.Thread(target=AssistantCoreInitializer).start()
 
     # Uncomment if you have xdg-screensaver installed and is funtioning
     # root.after(150000, keep_screen_awake)
     
-    root.protocol("WM_DELETE_WINDOW", on_closing)
-    root.bind('<Key>',key_pressed)
+    root.bind("<<terminate>>", Assistant.terminate)
+    root.bind('<Key>', key_pressed)
 
     root.mainloop()
 
