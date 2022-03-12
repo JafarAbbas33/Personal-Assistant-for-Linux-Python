@@ -53,12 +53,16 @@ def command_present(my_spoken_text):
         # Need implementation
         return False
 
+    if 'remind me' in my_spoken_text:
+        threading.Thread()
+        return False
+
     if 'type for me' in my_spoken_text:
         # Need implementation
         return False
 
     if is_com_present(my_spoken_text, [], ['play a random song', 'play a song', 'play some music', 'play some song', 'play music']):
-        play_media('my_utils/assistant_replies/Sure sir! Playing songs!.wav', threaded = False)
+        Assistant.play_voice('Sure sir! Playing songs!')
         play_media(os.environ['music_directory'])
         return True
 
@@ -82,7 +86,6 @@ def command_present(my_spoken_text):
     
     if is_com_present(my_spoken_text, [], ['goodbye', 'quit', 'exit', 'good bye']):
         Assistant.logger.info('Heard exit command')
-        # Assistant.terminate()
         Assistant.terminate_flag = True
         Assistant.logger.info('Returning after hearing exit command')
         return True

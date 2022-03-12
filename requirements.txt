@@ -10,7 +10,8 @@ google-assistant-sdk[samples]
 google-assistant-grpc
 google-auth-oauthlib[tool]
 youtube-search-python
-pytube
+git+https://github.com/baxterisme/pytube
+#pytube
 playsound
 icecream
 tenacity

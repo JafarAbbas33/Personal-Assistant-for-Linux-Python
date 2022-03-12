@@ -1,6 +1,9 @@
+import os
 import sys
 import time
 import threading
+
+from playsound import playsound
 
 class Gui:
     assistant_window_canvas = None
@@ -25,38 +28,25 @@ class Assistant:
     terminate_flag = False
 
     @staticmethod
-    def terminate_from_main_thread():
-        Assistant.Gui.root.destroy()
-        Assistant.logger.info('Destroyed!\n')
-        sys.exit()
+    def play_voice(string):
+        if Assistant.Gui.root.state() == 'iconic':
+            Gui.bring_to_front()
+
+        Gui.update_text(string)
+        Assistant.Gui.root.update()
+        path = 'my_utils/assistant_replies/' + string + '.wav'
+        if os.path.exists(path):
+            playsound(path)
+        Gui.minimize()
     
     @staticmethod
     def terminate(event):
-        # print(dir(event))
-
-        # for x in threading.enumerate():
-        #     print(x)
-        #     print(type(x))
-        # for i in range(3):
-        #     print('Thread count: ' + f'{threading.active_count()}')
-        #     time.sleep(0.5)
-
-        # Assistant.assistant.conversation_stream.close()
-        # Assistant.Gui.root.after(200, Assistant.terminate_from_main_thread)
-        # Assistant.logger.info("Destroying after 0.1 seconds...")
+        print()
         while threading.active_count() != 1:
+            print('Waiting for other threads to quit...')
             time.sleep(0.3)
             
+        Assistant.play_voice('Sayonara!')
         print('Gracefully exiting.')
         Assistant.logger.info('Gracefully exiting.')
         Assistant.Gui.root.destroy()
-        # Assistant.logger.info("Destroying after 0.2 seconds...")
-        
-        # print('---------------------------------------------------------')
-        # for i in range(3):
-        #     print('Thread count: ' + f'{threading.active_count()}')
-        #     time.sleep(0.5)
-        # for x in threading.enumerate():
-        #     print(x)
-        #     print(type(x))
-        # sys.exit()

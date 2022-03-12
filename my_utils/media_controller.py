@@ -1,10 +1,17 @@
 import subprocess, time, os
 from threading import Thread
 from playsound import playsound
+from Assistant import Assistant
 
 
 queued_media_pid = None
 def play_media(path, threaded=True):
+    cmd = ['nohup', 'vlc', '"' + path + '"', '&']
+    os.system(' '.join(cmd))
+    return True
+
+
+    subprocess.run(cmd)
     stop_media()
         
     print('Playing media...')
@@ -39,12 +46,7 @@ def resume_media():
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE).communicate()
-        
-if __name__ == '__main__':
-    playsound('/home/jafarabbas33/Desktop/Coding_Projects/NatalieCode/my_utils/assistant_replies/greeting.wav')
-    play_media('/home/jafarabbas33/Desktop/Coding_Projects/NatalieCode/my_utils/assistant_replies/Hello sir! It has been a long time!.wav') #, threaded=False)
-else:
-    from Assistant import Assistant
+
 
     
 # For audacious

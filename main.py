@@ -51,6 +51,10 @@ def update_text(text):
     return
 
 def bring_to_front():
+    # Assistant.Gui.root.update()
+    # if root.state() == 'normal':
+    #     return
+
     update_text("")
 
     mic = Assistant.Gui.mic
