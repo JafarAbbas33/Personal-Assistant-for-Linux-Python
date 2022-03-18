@@ -27,9 +27,20 @@ if os.environ['music_directory'] == 'YOUR MUSIC DIRECTORY':
 
 # -----------------------------------------------------------------------
 
-sys.path.insert(0, 'utils')
-sys.path.insert(0, 'my_utils')
-full_text = ''
+def fix_paths():
+    sys.path.insert(0, 'utils')
+    sys.path.insert(0, 'my_utils')
+
+    # print(sys.argv[0])
+    if '/' not in sys.argv[0]:
+        return
+    # print('Out')
+    script_location = sys.argv[0].split('/')
+    script_location.pop(-1)
+    cwd = '/'.join(script_location)
+    os.chdir(cwd)
+
+fix_paths()
 
 import tkinter as tk
 from PIL import Image
@@ -105,20 +116,17 @@ def get_logger():
     logger = logging.getLogger('Natalie')
     logger.setLevel(logging.DEBUG)
     handler = logging.FileHandler('Natalie.log')
-    #f_format = logging.Formatter('%(asctime)s - %(lineno)d - %(name)s - %(levelname)s - %(message)s')
-    f_format = logging.Formatter('%(asctime)s - %(filename)s - %(lineno)d - %(message)s')
+    # terminal_logger = logging.StreamHandler(sys.stdout) # Uncomment to print logs to terminal as well  
+    # f_format = logging.Formatter('%(asctime)s - %(lineno)d - %(name)s - %(levelname)s - %(message)s')
+    # f_format = logging.Formatter('%(asctime)s - %(filename)s - %(lineno)d - %(message)s')
+    f_format = logging.Formatter('%(filename)s - %(lineno)d - %(message)s')
     handler.setFormatter(f_format)
-    logger.addHandler(handler)    
+    # terminal_logger.setFormatter(f_format) # Uncomment to print logs to terminal as well  
+    logger.addHandler(handler)  
+    # logger.addHandler(terminal_logger) # Uncomment to print logs to terminal as well  
     logger.propagate = False
     return logger
 
-def set_cwd():
-    if '/' not in sys.argv[0]:
-        return
-    script_location = sys.argv[0].split('/')
-    script_location.pop(-1)
-    cwd = '/'.join(script_location)
-    os.chdir(cwd)
 
 def initialize_root_window():
     root = tk.Tk()
@@ -134,7 +142,6 @@ def initialize_root_window():
 
 
 if __name__ == '__main__':
-    set_cwd()
     root = initialize_root_window()
     #print(dir(root)) # after # generate_event # destroy
     
@@ -165,7 +172,7 @@ if __name__ == '__main__':
 
     bring_to_front()
     update_text("Initializing")
-    Assistant.logger.info('-----------------------------------------\n')
+    Assistant.logger.info('----------------------------------------------------------------------------------------------------------------------------------------------\n')
     Assistant.logger.info('Initializing')
 
     Assistant.assistant_thread = threading.Thread(target=AssistantCoreInitializer).start()

@@ -146,13 +146,22 @@ class PorcupineClass(Thread):
 
 
 def start_hotword_detection():
-    PorcupineClass(
-        library_path=pvporcupine.LIBRARY_PATH,
-        model_path=pvporcupine.MODEL_PATH,
-        keyword_paths=[os.environ['hotword_full_path']],
-        sensitivities=[0.50],
-        output_path=None,
-        input_device_index=None).run()
+    try:
+        PorcupineClass(
+            library_path=pvporcupine.LIBRARY_PATH,
+            model_path=pvporcupine.MODEL_PATH,
+            keyword_paths=[os.environ['hotword_full_path']],
+            sensitivities=[0.50],
+            output_path=None,
+            input_device_index=None).run()
+    except Exception as e:
+        Assistant.logger.info('\nERROR OCCURED: ' + str(e))
+        Assistant.logger.info('Hotword file probably is outdated. Opening website to help in downloading a new one.')
+        import webbrowser
+        webbrowser.open('https://console.picovoice.ai/ppn', 2)
+        
+        # Terminate assistant
+        Assistant.terminate_flag = True
 
 
 if __name__ == '__main__':

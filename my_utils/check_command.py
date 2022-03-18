@@ -1,9 +1,11 @@
+import imp
 import os
 import youtube
 import logging
 import threading
 import subprocess
 import webbrowser
+import remainder_manager
 
 from commands_executor import shutdown
 from Assistant import Assistant
@@ -54,7 +56,7 @@ def command_present(my_spoken_text):
         return False
 
     if 'remind me' in my_spoken_text:
-        threading.Thread()
+        threading.Thread(target=remainder_manager.check_reminder).start()
         return False
 
     if 'type for me' in my_spoken_text:

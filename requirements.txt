@@ -15,3 +15,6 @@ git+https://github.com/baxterisme/pytube
 playsound
 icecream
 tenacity
+python-crontab
+PyGObject
+sounddevice
