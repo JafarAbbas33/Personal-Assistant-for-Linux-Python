@@ -87,10 +87,35 @@ def AssistantCoreInitializer():
             http_request = google.auth.transport.requests.Request()
             credentials.refresh(http_request)
     except Exception as e:
-        print('Error loading credentials: %s', e)
-        print('Run google-oauthlib-tool to initialize '
+        Assistant.logger.info('Error loading credentials: %s', e)
+        Assistant.logger.info('Run google-oauthlib-tool to initialize '
                       'new OAuth 2.0 credentials.')
-        sys.exit(-1)
+
+
+        # Assistant.Gui.bring_to_front()
+        Assistant.Gui.update_text("Credentials error. Running appropriate program to update it.\nCommand is automatically copied. Paste it in the following program.")
+        time.sleep(6)
+        Assistant.Gui.minimize()
+
+        os.system('x-terminal-emulator -e "my_utils/google-oauthlib-tool-helper"')
+        
+        try:
+            with open(credentials, 'r') as f:
+                credentials = google.oauth2.credentials.Credentials(token=None,
+                                                                    **json.load(f))
+                http_request = google.auth.transport.requests.Request()
+                credentials.refresh(http_request)
+        except Exception as e:
+            Assistant.Gui.bring_to_front()
+            Assistant.Gui.update_text("Failed to load credentials. Quitting.")
+            Assistant.logger.info('Failed to load credentials. Quitting.\n')
+            time.sleep(2)
+            Assistant.Gui.minimize()
+
+            Assistant.terminate_flag = True
+
+            return False
+
 
     # Create an authorized gRPC channel.
     grpc_channel = google.auth.transport.grpc.secure_authorized_channel(
