@@ -1,0 +1,17 @@
+#!/usr/bin/sh
+
+google-oauthlib-tool --client-secrets ./STAGING_FOLDER/google_oauth_credentials.json --scope https://www.googleapis.com/auth/assistant-sdk-prototype --save --headless
+
+if [[ $? != 0 ]]; then
+  echo
+  read -p "Want to download oauth file? (y/n): " temp
+
+  if [[ "$temp" == "y" ]]; then
+    echo "Disabling..."
+    xdg-open https://console.cloud.google.com/apis/credentials
+  fi
+fi
+
+mv --force $HOME/.config/google-oauthlib-tool/credentials.json ./STAGING_FOLDER/assistant_credentials.json
+
+sleep 5
